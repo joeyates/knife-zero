@@ -3,6 +3,9 @@ require 'knife-zero/core/bootstrap_context'
 
 class TC_BootstrapContext < Test::Unit::TestCase
   def setup
+    ChefUtils::Dist::Infra.send :remove_const, "DIR_SUFFIX"
+    ChefUtils::Dist::Infra.const_set "DIR_SUFFIX", "notm"
+
     Chef::Config[:validation_key] = nil
     app = Chef::Knife::ZeroBootstrap.new
     app.merge_configs
@@ -16,5 +19,9 @@ class TC_BootstrapContext < Test::Unit::TestCase
 
   test "Should use aliased start_chef" do
     assert_match('-S http://127.0.0.1', @bsc.start_chef)
+  end
+
+  test "Should use DIR_SUFFIX" do
+    assert_match(' -j /etc/notm/first-boot.json ', @bsc.start_chef)
   end
 end
